@@ -1,7 +1,8 @@
 from email import message
-from telegram import Update
-from telegram.ext import Updater, CommandHandler, CallbackContext
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters, CallbackQueryHandler
 from random import randint
+import logging
 
 
 database = {} # БД вида {ID:[Имя, банк, побед, поражений]}
@@ -83,3 +84,30 @@ def input_check(msg):
         return 1 <=  int(msg.split()[0]) <= 4
     except:
         return 0
+
+#логирование и кнопки
+
+def start_buttom(update, _):
+    keyboard = [
+        [
+            InlineKeyboardButton("Option 1", callback_data='1'),
+            InlineKeyboardButton("Option 2", callback_data='2'),
+        ],
+        [InlineKeyboardButton("Option 3", callback_data='3')],
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    update.message.reply_text('Пожалуйста, выберите:', reply_markup=reply_markup)
+
+
+def button(update, _):
+    query = update.callback_query
+    variant = query.data
+
+    # `CallbackQueries` требует ответа, даже если 
+    # уведомление для пользователя не требуется, в противном
+    #  случае у некоторых клиентов могут возникнуть проблемы. 
+    # смотри https://core.telegram.org/bots/api#callbackquery.
+    query.answer()
+    # редактируем сообщение, тем самым кнопки 
+    # в чате заменятся на этот ответ.
+    query.edit_message_text(text=f"Выбранный вариант: {variant}")
