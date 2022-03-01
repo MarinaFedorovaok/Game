@@ -41,8 +41,8 @@ def run(update: Update, context: CallbackContext):
 # ход игрока
 def turn(update: Update, context: CallbackContext):
     user(update, context)
-    msg = int(update.message.text)
-    if 1 <= msg <= 4:
+    msg = update.message.text
+    if input_check(msg):
         database[update.effective_user.id][bank] -= int(update.message.text)
         if database[update.effective_user.id][bank] <= 0:
             update.message.reply_text(f'Вы берёте последнюю спичку и побеждаете в игре!\nКоманда /run начнёт новую игру.\nКоманда /stats покажет вашу статистику игр.')
@@ -80,6 +80,6 @@ def bot_logic(s):
 #  проверка ввода
 def input_check(msg):
     try:
-        return 1 <=  int(msg.split()[1]) <= 4
+        return 1 <=  int(msg.split()[0]) <= 4
     except:
         return 0
